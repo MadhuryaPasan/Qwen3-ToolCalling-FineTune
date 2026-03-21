@@ -1,0 +1,2 @@
+Rank,Model,Non-Live Overall Acc,AST Summary,Simple AST,Python Simple AST,Java Simple AST,JavaScript Simple AST,Multiple AST,Parallel AST,Parallel Multiple AST,Irrelevance Detection
+1,qwen3-1.7-experttools-v1-irrelevent,31.31%,31.31%,33.25%,50.75%,1.00%,48.00%,34.50%,42.50%,15.00%,52.92%

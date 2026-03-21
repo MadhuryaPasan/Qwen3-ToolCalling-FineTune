@@ -1,0 +1,364 @@
+
+"### Role
+You are a Senior Java Developer with deep expertise in type systems, API design and JSON schema conventions used in Java-based tool/function calling systems.
+
+### Task
+Convert the following tool definitions (originally written in Python-style or generic schema notation) into **strict, production-ready Java-style tool definitions**.
+
+Rules you MUST follow:
+
+1. Do NOT change:
+   - tool name
+   - function name inside "answers"
+   - argument names
+   - descriptions (except when they explicitly mention Python or contain Python-specific wording)
+   - default values (except type conversion when necessary)
+   - query / answers content
+
+2. MUST change / normalize:
+   - Every type name that is Python-style or JSON-schema style → convert to proper **Java** type names
+   - "str"           → "String"
+   - "int"           → "Integer"     (preferred over primitive int in tool schemas)
+   - "float"         → "Double"
+   - "double"        → "Double"
+   - "bool"          → "Boolean"
+   - "boolean"       → "Boolean"
+   - "List[int]"     → "List<Integer>"
+   - "List[str]"     → "List<String>"
+   - "List[float]"   → "List<Double>"
+   - "List[Union[int, float]]" → "List<Double>"   (or "List<Number>" when you judge it more appropriate)
+   - "dict"          → "Map<String, Object>"     (or more specific when the content is clear)
+   - Remove any ", optional" from the type field → optionality should be expressed via "required": false or by using wrapper types (not by writing ", optional" in the type string)
+
+3. Keep the structure 100% compatible with the input format:
+   - Return **only** valid JSON — no markdown, no explanations, no comments, no extra text
+   - Preserve the array-of-objects format exactly
+   - Preserve all existing keys (id, query, answers, tools)
+
+4. When a description says something like "python", "This is a python function", "python API", etc. → rewrite it to remove Python-specific wording and make it neutral / Java-appropriate.
+
+This output will be used as training data for a model.  
+Every detail must be consistent, correct Java-style, and free of typos.
+
+Input data:
+
+[the array of tool examples goes here]"
+
+
+
+
+
+
+
+
+
+
+
+[
+  {
+    "id": 0,
+    "query": "Where can I find live giveaways for beta access and games?",
+    "answers": "[{\"name\": \"live_giveaways_by_type\", \"arguments\": {\"type\": \"beta\"}}, {\"name\": \"live_giveaways_by_type\", \"arguments\": {\"type\": \"game\"}}]",
+    "tools": "[{\"name\": \"live_giveaways_by_type\", \"description\": \"Retrieve live giveaways from the GamerPower API based on the specified type.\", \"parameters\": {\"type\": {\"description\": \"The type of giveaways to retrieve (e.g., game, loot, beta).\", \"type\": \"String\", \"default\": \"game\"}}}]"
+  },
+  {
+    "id": 1,
+    "query": "I need to understand the details of the Ethereum blockchain for my cryptocurrency project. Can you fetch the details for 'ethereum'?",
+    "answers": "[{\"name\": \"web_chain_details\", \"arguments\": {\"chain_slug\": \"ethereum\"}}]",
+    "tools": "[{\"name\": \"peers\", \"description\": \"Retrieves a list of company peers given a stock symbol.\", \"parameters\": {\"symbol\": {\"description\": \"The stock symbol for the company.\", \"type\": \"String\", \"default\": \"\"}}}, {\"name\": \"web_chain_details\", \"description\": \"Fetches details for the specified blockchain.\", \"parameters\": {\"chain_slug\": {\"description\": \"The slug identifier for the blockchain (e.g., 'ethereum' for Ethereum mainnet).\", \"type\": \"String\", \"default\": \"ethereum\"}}}]"
+  },
+  {
+    "id": 2,
+    "query": "What is the T3MA for 'ETH/BTC' using a 1h interval and a time period of 14?",
+    "answers": "[{\"name\": \"t3ma\", \"arguments\": {\"symbol\": \"ETH/BTC\", \"interval\": \"1h\", \"time_period\": 14}}]",
+    "tools": "[{\"name\": \"t3ma\", \"description\": \"Fetches the Triple Exponential Moving Average (T3MA) for a given financial instrument.\", \"parameters\": {\"symbol\": {\"description\": \"Instrument symbol, which can be any equity, index, ETF, forex, or cryptocurrency (e.g., 'AAPL', 'EUR/USD', 'ETH/BTC').\", \"type\": \"String\", \"default\": \"AAPL\"}, \"interval\": {\"description\": \"Interval between two consecutive points in the time series. Supported intervals include '1min', '5min', '15min', '30min', '45min', '1h', '2h', '4h', '1day', '1week', and '1month'.\", \"type\": \"String\", \"default\": \"1min\"}, \"format\": {\"description\": \"Format of the response data, either 'CSV' or 'JSON'. Default is 'json'.\", \"type\": \"String\", \"default\": \"json\"}, \"v_factor\": {\"description\": \"Volume factor used in the calculation of the T3MA.\", \"type\": \"Integer\", \"default\": 0.7}, \"series_type\": {\"description\": \"Type of series to use in the calculation. Supported values are 'open', 'high', 'low', and 'close'. Default is 'close'.\", \"type\": \"String\", \"default\": \"close\"}, \"outputsize\": {\"description\": \"Number of data points to return. Default is 30.\", \"type\": \"Integer\", \"default\": 30}, \"time_period\": {\"description\": \"Number of periods over which to calculate the T3MA. Default is 9.\", \"type\": \"Integer\", \"default\": 9}}}, {\"name\": \"stock_v2_get_profile\", \"description\": \"Retrieves the company profile information for a given performance ID using the RapidAPI Morning Star service.\", \"parameters\": {\"performanceid\": {\"description\": \"The performance ID of the stock, obtained from endpoints such as /auto-complete, /get-summary, or /get-movers.\", \"type\": \"String\", \"default\": \"0P0000OQN8\"}}}]"
+  },
+  {
+    "id": 3,
+    "query": "List titles originally aired on networks '1' and '8', released after 2010, sorted by release date in descending order.",
+    "answers": "[{\"name\": \"list_titles\", \"arguments\": {\"network_ids\": \"1,8\", \"release_date_start\": 20110101, \"sort_by\": \"release_date_desc\"}}]",
+    "tools": "[{\"name\": \"get_animes\", \"description\": \"Retrieves a list of animes based on specified search criteria and filters from the RapidAPI Anime API.\", \"parameters\": {\"year_greater\": {\"description\": \"Find animes released after the specified year.\", \"type\": \"Integer\", \"default\": \"\"}, \"media_type\": {\"description\": \"Filter by media type (e.g., music, tv, ona, ova, movie, special).\", \"type\": \"String\", \"default\": \"\"}, \"studio\": {\"description\": \"Filter by studio name.\", \"type\": \"String\", \"default\": \"\"}, \"year_less\": {\"description\": \"Find animes released before the specified year.\", \"type\": \"Integer\", \"default\": \"\"}, \"nsfw\": {\"description\": \"Include NSFW content if set.\", \"type\": \"String\", \"default\": \"\"}, \"status\": {\"description\": \"Filter by anime status (e.g., currently_airing, finished_airing, not_yet_aired).\", \"type\": \"String\", \"default\": \"\"}, \"limit\": {\"description\": \"Limit the number of results.\", \"type\": \"Integer\", \"default\": \"\"}, \"q\": {\"description\": \"Search for animes by title in English or Japanese.\", \"type\": \"String\", \"default\": \"\"}, \"genre\": {\"description\": \"Filter by genre.\", \"type\": \"String\", \"default\": \"\"}, \"sort\": {\"description\": \"Specify sort order, true for ascending and false for descending.\", \"type\": \"Boolean\", \"default\": \"\"}, \"offset\": {\"description\": \"Number of results to skip.\", \"type\": \"Integer\", \"default\": \"\"}, \"season\": {\"description\": \"Filter by season.\", \"type\": \"String\", \"default\": \"\"}, \"fields\": {\"description\": \"Specify the fields to return (e.g., id, title, main_picture, etc.).\", \"type\": \"String\", \"default\": \"\"}, \"year_equal\": {\"description\": \"Filter by animes released in the specified year.\", \"type\": \"Integer\", \"default\": \"\"}, \"source\": {\"description\": \"Filter by source material (e.g., manga, visual_novel, novel, etc.).\", \"type\": \"String\", \"default\": \"\"}, \"order\": {\"description\": \"Order results by a specific field.\", \"type\": \"String\", \"default\": \"\"}}}, {\"name\": \"list_titles\", \"description\": \"Fetches a listing of titles that match specified parameters from the Watchmode API.\", \"parameters\": {\"genres\": {\"description\": \"Filter results to only include certain genre(s). Pass in a single genre ID or multiple comma-separated IDs. Default is '4,9'.\", \"type\": \"String\", \"default\": \"4,9\"}, \"limit\": {\"description\": \"Set how many titles to return per page. Default and maximum is 250.\", \"type\": \"Integer\", \"default\": 250}, \"source_ids\": {\"description\": \"Filter the results to titles available on specific sources by passing individual IDs or multiple comma-separated IDs. Default is '23,206'. Note: Only a single region can be set if this is populated.\", \"type\": \"String\", \"default\": \"23,206\"}, \"source_types\": {\"description\": \"Filter results to only include titles available on specific types of sources (e.g., subscription, free). Default is 'sub,free'. Note: Only a single region can be set if this is populated.\", \"type\": \"String\", \"default\": \"sub,free\"}, \"types\": {\"description\": \"Filter results to only include titles available on specific types of sources (e.g., subscription, free). Default is 'sub,free'. Note: Only a single region can be set if this is populated.\", \"type\": \"String\", \"default\": \"movie,tv_series\"}, \"regions\": {\"description\": \"Filter results to only include sources active in specific regions. Currently supported regions: US, GB, CA, AU. Default is 'US'. Note: Only a single region can be set if source_ids or source_types are populated.\", \"type\": \"String\", \"default\": \"US\"}, \"sort_by\": {\"description\": \"Sort order of results. Possible values include: relevance_desc, relevance_asc, popularity_desc, popularity_asc, release_date_desc, release_date_asc, title_desc, title_asc. Default is 'relevance_desc'.\", \"type\": \"String\", \"default\": \"relevance_desc\"}, \"page\": {\"description\": \"Set the page of results to return. Default is 1.\", \"type\": \"Integer\", \"default\": 1}, \"network_ids\": {\"description\": \"Filter results to titles that originally aired on specific TV networks by passing individual IDs or multiple comma-separated IDs. Default is '1,8,12'.\", \"type\": \"String\", \"default\": \"1,8,12\"}, \"release_date_start\": {\"description\": \"Filter results to only include titles released on or after a specific date. Format: YYYYMMDD. Default is 20010101.\", \"type\": \"Integer\", \"default\": 20010101}, \"release_date_end\": {\"description\": \"Filter results to only include titles released on or before a specific date. Format: YYYYMMDD. Default is 20201211.\", \"type\": \"Integer\", \"default\": 20201211}}}]"
+  },
+  {
+    "id": 4,
+    "query": "Fetch the competitor standings for the recently concluded stage 98765.",
+    "answers": "[{\"name\": \"stagecompetitorstandings\", \"arguments\": {\"is_id\": 98765}}]",
+    "tools": "[{\"name\": \"stagecompetitorstandings\", \"description\": \"Retrieve the competitor standings for a specific Motorsport stage using the given stage ID.\", \"parameters\": {\"is_id\": {\"description\": \"The ID of the stage for which to retrieve competitor's standings.\", \"type\": \"Integer\", \"default\": 203968}}}]"
+  },
+  {
+    "id": 5,
+    "query": "Fetch details for product 456789 with locale 'es_ES'.",
+    "answers": "[{\"name\": \"product_id\", \"arguments\": {\"is_id\": 456789, \"locale\": \"es_ES\"}}]",
+    "tools": "[{\"name\": \"get_product\", \"description\": \"Fetches product details from an API using the given product ID.\", \"parameters\": {\"is_id\": {\"description\": \"The product ID for which to retrieve details.\", \"type\": \"Integer\", \"default\": \"\"}}}, {\"name\": \"product_id\", \"description\": \"Fetches product details from the AliExpress API using the provided product ID and optional parameters.\", \"parameters\": {\"is_id\": {\"description\": \"The ID of the product to fetch details for.\", \"type\": \"Integer\", \"default\": 4000886597329}, \"locale\": {\"description\": \"The locale to be used for the request (e.g., 'en_US').\", \"type\": \"String\", \"default\": \"\"}, \"currency\": {\"description\": \"The currency for price conversion (e.g., 'USD').\", \"type\": \"String\", \"default\": \"\"}, \"country\": {\"description\": \"The country for regional adjustments (e.g., 'US').\", \"type\": \"String\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 6,
+    "query": "Identify the ID of 'Pulp Fiction' and search for torrents related to it.",
+    "answers": "[{\"name\": \"get_id\", \"arguments\": {\"q\": \"Pulp Fiction\"}}, {\"name\": \"search_torrents\", \"arguments\": {\"keywords\": \"Pulp Fiction\", \"quantity\": 10}}]",
+    "tools": "[{\"name\": \"get_id\", \"description\": \"Fetches the ID of a movie based on the given search query from the RapidAPI similar movies service.\", \"parameters\": {\"q\": {\"description\": \"The search string for the movie title.\", \"type\": \"String\", \"default\": \"titanic\"}}}, {\"name\": \"search_torrents\", \"description\": \"Search for torrents based on given keywords using the RapidAPI service.\", \"parameters\": {\"keywords\": {\"description\": \"Keywords to search for torrents.\", \"type\": \"String\", \"default\": \"Meg 2 The Trench\"}, \"quantity\": {\"description\": \"Number of torrent results to return. Maximum value is 40.\", \"type\": \"Integer\", \"default\": 40}, \"page\": {\"description\": \"Page number for paginated results. Defaults to 1.\", \"type\": \"Integer\", \"default\": 1}}}, {\"name\": \"basic_info\", \"description\": \"Fetches detailed information about a cast member such as name, profession, birth and death year, bio, poster, and best titles.\", \"parameters\": {\"peopleid\": {\"description\": \"The ID of the cast member whose details are to be fetched.\", \"type\": \"String\", \"default\": \"nm0000375\"}}}]"
+  },
+  {
+    "id": 7,
+    "query": "Can you find the time zone for a Canadian postal code G2J and a latitude-longitude pair of 48.8567,2.3508?",
+    "answers": "[{\"name\": \"time_zone_api\", \"arguments\": {\"q\": \"G2J\"}}, {\"name\": \"time_zone_api\", \"arguments\": {\"q\": \"48.8567,2.3508\"}}]",
+    "tools": "[{\"name\": \"time_zone_api\", \"description\": \"Fetches up-to-date time zone and local time information as JSON based on a given query parameter.\", \"parameters\": {\"q\": {\"description\": \"Query parameter to fetch time zone data.\", \"type\": \"String\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 8,
+    "query": "Determine the peak of the sequence [44, 46, 48, 50, 52] and the light travel time for 25 light years.",
+    "answers": "[{\"name\": \"find_peak_element\", \"arguments\": {\"nums\": [44, 46, 48, 50, 52]}}, {\"name\": \"light_travel_time\", \"arguments\": {\"distance_in_light_years\": 25}}]",
+    "tools": "[{\"name\": \"find_peak_element\", \"description\": \"Finds a peak element in a list of integers.\", \"parameters\": {\"nums\": {\"description\": \"The list of integers.\", \"type\": \"List\"}}}, {\"name\": \"light_travel_time\", \"description\": \"Calculate the time taken for light to travel from one celestial body to another.\", \"parameters\": {\"distance_in_light_years\": {\"description\": \"The distance between the two celestial bodies in light years.\", \"type\": \"Integer\", \"default\": 299792458}, \"speed_of_light\": {\"description\": \"The speed of light in vacuum, in m/s. Default value is 299792458 m/s.\", \"type\": \"Integer\", \"default\": 299792458}}}]"
+  },
+  {
+    "id": 9,
+    "query": "Is 'https://www.apple.com' available in the Wayback Machine on September 9, 2015?",
+    "answers": "[{\"name\": \"availability\", \"arguments\": {\"url\": \"https://www.apple.com\", \"timestamp\": \"20150909\"}}]",
+    "tools": "[{\"name\": \"availability\", \"description\": \"Checks if a given URL is archived and currently accessible in the Wayback Machine.\", \"parameters\": {\"url\": {\"description\": \"The URL to check for availability in the Wayback Machine.\", \"type\": \"String\", \"default\": \"http://mashape.com\"}, \"timestamp\": {\"description\": \"The timestamp to look up in Wayback. If not specified, the most recent available capture is returned. The format of the timestamp is 1-14 digits (YYYYMMDDhhmmss). Defaults to '20090101'.\", \"type\": \"String\", \"default\": \"20090101\"}, \"callback\": {\"description\": \"An optional callback to produce a JSONP response.\", \"type\": \"String\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 10,
+    "query": "Can you fetch poor quality backlinks for the domain 'example.com'? Also, generate a QR code for the text 'Visit our website at example.com'.",
+    "answers": "[{\"name\": \"poor_backlinks\", \"arguments\": {\"domain\": \"example.com\"}}, {\"name\": \"qrcode\", \"arguments\": {\"data\": \"Visit our website at example.com\"}}]",
+    "tools": "[{\"name\": \"poor_backlinks\", \"description\": \"Fetch poor quality backlinks for a given domain using the Best Backlink Checker API.\", \"parameters\": {\"domain\": {\"description\": \"The domain for which to fetch the poor quality backlinks.\", \"type\": \"String\", \"default\": \"getecz.com\"}}}, {\"name\": \"get_random_user\", \"description\": \"Fetch a random user profile based on specified criteria using the ai-random-user-generator API.\", \"parameters\": {\"results\": {\"description\": \"Number of user profiles to fetch. Default is '7'.\", \"type\": \"String\", \"default\": \"7\"}, \"nation\": {\"description\": \"Nationality of the users. Default is 'en_US'.\", \"type\": \"String\", \"default\": \"en_US\"}, \"gender\": {\"description\": \"Gender of the users. Default is 'female'.\", \"type\": \"String\", \"default\": \"female\"}}}, {\"name\": \"company_search\", \"description\": \"Search for companies by name using the Indeed API.\", \"parameters\": {\"company_name\": {\"description\": \"The name of the company to search for.\", \"type\": \"String\", \"default\": \"Microsoft\"}, \"locality\": {\"description\": \"Select the Indeed's country subdomain to search within. The default value is 'us'.\", \"type\": \"String\", \"default\": \"\"}}}, {\"name\": \"album_tracks\", \"description\": \"Fetches the tracks of a specified album from the Spotify API using RapidAPI.\", \"parameters\": {\"is_id\": {\"description\": \"The unique identifier for the album.\", \"type\": \"String\", \"default\": \"3IBcauSj5M2A6lTeffJzdv\"}, \"offset\": {\"description\": \"The starting point for the track list. Defaults to 0.\", \"type\": \"Integer\", \"default\": 0}, \"limit\": {\"description\": \"The maximum number of tracks to return. Defaults to 300.\", \"type\": \"Integer\", \"default\": 300}}}, {\"name\": \"qrcode\", \"description\": \"Generate a QR code based on the provided data string using the QR Code Generator API.\", \"parameters\": {\"data\": {\"description\": \"The input data to be converted into a QR code.\", \"type\": \"String\", \"default\": \"Hello World!\"}}}]"
+  },
+  {
+    "id": 11,
+    "query": "Fetch auto-complete results for 'winter coat' from Kohls and 'kitchen appliance' from Wayfair.",
+    "answers": "[{\"name\": \"auto_complete_deprecating\", \"arguments\": {\"query\": \"winter coat\"}}, {\"name\": \"auto_complete\", \"arguments\": {\"query\": \"kitchen appliance\"}}]",
+    "tools": "[{\"name\": \"auto_complete_deprecating\", \"description\": \"Fetch auto-complete suggestions for a given query from the specified API.\", \"parameters\": {\"query\": {\"description\": \"The term or phrase for which to get suggestions.\", \"type\": \"String\", \"default\": \"bikini tops\"}}}, {\"name\": \"auto_complete\", \"description\": \"Fetch auto-complete suggestions for a given query using the Wayfair API.\", \"parameters\": {\"query\": {\"description\": \"The term or phrase for which auto-complete suggestions are needed.\", \"type\": \"String\", \"default\": \"red pillow\"}}}]"
+  },
+  {
+    "id": 12,
+    "query": "I need the schedules of matches happening on February 28, 2024.",
+    "answers": "[{\"name\": \"matchschedules\", \"arguments\": {\"day\": 28, \"month\": 2, \"year\": 2024}}]",
+    "tools": "[{\"name\": \"matchschedules\", \"description\": \"Fetches the schedules of ice hockey matches for a specified date, including match timings, teams, and other relevant information.\", \"parameters\": {\"day\": {\"description\": \"The day of the month for which you want to retrieve the schedules (1-31).\", \"type\": \"Integer\", \"default\": 28}, \"year\": {\"description\": \"The year for which you want to retrieve the schedules (e.g., 2022).\", \"type\": \"Integer\", \"default\": 2022}, \"month\": {\"description\": \"The month for which you want to retrieve the schedules (1-12).\", \"type\": \"Integer\", \"default\": 11}}}]"
+  },
+  {
+    "id": 13,
+    "query": "I need to order 3 cartons of milk and 2 loaves of bread from the Safeway in Palo Alto, CA. Can you handle that?",
+    "answers": "[{\"name\": \"place_safeway_order\", \"arguments\": {\"location\": \"Palo Alto, CA\", \"items\": [\"milk\", \"bread\"], \"quantity\": [3, 2]}}]",
+    "tools": "[{\"name\": \"get_ip_location\", \"description\": \"Retrieves the latitude and longitude coordinates of a given IP address using the ip-api.com API.\", \"parameters\": {\"ip\": {\"description\": \"The IP address to locate.\", \"type\": \"String\"}}}, {\"name\": \"structural_analysis\", \"description\": \"Performs structural analysis on a building based on its ID, floor numbers, and analysis mode.\", \"parameters\": {\"building_id\": {\"description\": \"The unique identifier of the building.\", \"type\": \"String\", \"default\": \"static\"}, \"floor_numbers\": {\"description\": \"The list of floor numbers to be analyzed.\", \"type\": \"List\", \"default\": \"static\"}, \"analysis_mode\": {\"description\": \"The mode of analysis, either 'static' or 'dynamic'.\", \"type\": \"String\", \"default\": \"static\"}}}, {\"name\": \"reserve_hotel_room\", \"description\": \"Reserves a hotel room with the specified details.\", \"parameters\": {\"room_type\": {\"description\": \"The type of room to reserve.\", \"type\": \"String\"}, \"nightly_rate\": {\"description\": \"The nightly rate for the room.\", \"type\": \"Double\"}, \"checkin_date\": {\"description\": \"The check-in date in the format 'YYYY-MM-DD'.\", \"type\": \"String\"}, \"checkout_date\": {\"description\": \"The check-out date in the format 'YYYY-MM-DD'.\", \"type\": \"String\"}, \"guest_id\": {\"description\": \"The unique identifier for the guest.\", \"type\": \"String\"}, \"promo_code\": {\"description\": \"A promotional code for a discount.\", \"type\": \"String\", \"default\": null}}}, {\"name\": \"simulate_query_database\", \"description\": \"Simulates querying a database based on certain conditions.\", \"parameters\": {\"table\": {\"description\": \"Name of the table to query.\", \"type\": \"String\"}, \"conditions\": {\"description\": \"Conditions for the query, each condition is a dictionary.\", \"type\": \"List\"}}}, {\"name\": \"place_safeway_order\", \"description\": \"Order specified items from a Safeway location.\", \"parameters\": {\"location\": {\"description\": \"The location of the Safeway store, e.g., 'Palo Alto, CA'.\", \"type\": \"String\"}, \"items\": {\"description\": \"List of items to order.\", \"type\": \"List\"}, \"quantity\": {\"description\": \"Quantity of each item in the order list.\", \"type\": \"List\"}}}]"
+  },
+  {
+    "id": 14,
+    "query": "You are researching TikTok trends and need to look up the profiles of 'trendsetter1' and 'viralvideo2'. How would you implement this using the 'get_search_user' function?",
+    "answers": "[{\"name\": \"get_search_user\", \"arguments\": {\"is_id\": \"trendsetter1\"}}, {\"name\": \"get_search_user\", \"arguments\": {\"is_id\": \"viralvideo2\"}}]",
+    "tools": "[{\"name\": \"get_search_user\", \"description\": \"Fetches the search result for a specific username from the TikTok User API.\", \"parameters\": {\"is_id\": {\"description\": \"The username or ID to search for.\", \"type\": \"String\", \"default\": \"therock\"}}}]"
+  },
+  {
+    "id": 15,
+    "query": "Could you find the details of the TikTok post with the ID '6923456789012345678'? Also, provide me with the latest posts under '#technology'.",
+    "answers": "[{\"name\": \"get_post\", \"arguments\": {\"aweme_id\": \"6923456789012345678\"}}, {\"name\": \"hashtag_feed_video_posts_v2\", \"arguments\": {\"name\": \"technology\"}}]",
+    "tools": "[{\"name\": \"get_post\", \"description\": \"Fetches the details of a TikTok post using the given aweme_id via the RapidAPI service.\", \"parameters\": {\"aweme_id\": {\"description\": \"The unique identifier of the TikTok post to be fetched.\", \"type\": \"String\", \"default\": \"\"}}}, {\"name\": \"hashtag_feed_video_posts_v2\", \"description\": \"Fetches video posts related to a specific hashtag from a social media platform, providing metadata such as direct URLs, statistics, and more.\", \"parameters\": {\"name\": {\"description\": \"Hashtag name to filter videos.\", \"type\": \"String\", \"default\": \"summer\"}, \"limit\": {\"description\": \"Maximum number of records to return. Defaults to 20; the maximum is 20.\", \"type\": \"Integer\", \"default\": \"\"}, \"max_cursor\": {\"description\": \"Pagination cursor to fetch more videos. Use the value received from the previous request for continued pagination.\", \"type\": \"String\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 16,
+    "query": "Please get the meta data for cryptocurrency markets in French (France) with UTC+1 offset.",
+    "answers": "[{\"name\": \"get_meta_data\", \"arguments\": {\"locale_info\": \"fr-FR\", \"time_utc_offset\": 3600}}]",
+    "tools": "[{\"name\": \"get_meta_data\", \"description\": \"Fetches meta data from the cryptocurrency markets API using provided locale information and optional parameters.\", \"parameters\": {\"locale_info\": {\"description\": \"The language code.\", \"type\": \"String\", \"default\": \"en_US\"}, \"lang_id\": {\"description\": \"The language ID.\", \"type\": \"Integer\", \"default\": 1}, \"time_utc_offset\": {\"description\": \"The UTC offset in seconds.\", \"type\": \"Integer\", \"default\": 28800}}}]"
+  },
+  {
+    "id": 17,
+    "query": "Retrieve the highlight items for 'art_collector' on Instagram and the shorts from 'HistoryBuffs' on YouTube.",
+    "answers": "[{\"name\": \"get_highlight_item\", \"arguments\": {\"is_id\": \"art_collector\"}}, {\"name\": \"channel_shorts\", \"arguments\": {\"channel_id\": \"HistoryBuffs\"}}]",
+    "tools": "[{\"name\": \"get_highlight_item\", \"description\": \"Fetch the highlight item from Instagram using the toolbench RapidAPI.\", \"parameters\": {\"is_id\": {\"description\": \"The Instagram ID for which to fetch the highlight items.\", \"type\": \"String\", \"default\": \"17934390836227915\"}}}, {\"name\": \"channel_shorts\", \"description\": \"Fetch the latest shorts published by a YouTube channel using the provided channel_id and RapidAPI key.\", \"parameters\": {\"channel_id\": {\"description\": \"The ID of the YouTube channel.\", \"type\": \"String\", \"default\": \"UCVhQ2NnY5Rskt6UjCUkJ_DA\"}}}]"
+  },
+  {
+    "id": 18,
+    "query": "Future value of 2000 dollars at 2% for 8 years?",
+    "answers": "[{\"name\": \"future_investment_value\", \"arguments\": {\"present_value\": 2000, \"annual_interest_rate\": 0.02, \"years\": 8}}]",
+    "tools": "[{\"name\": \"calculate_standard_deviation\", \"description\": \"Calculates the standard deviation of a list of numbers.\", \"parameters\": {\"numbers\": {\"description\": \"The list of numbers.\", \"type\": \"List\"}}}, {\"name\": \"future_investment_value\", \"description\": \"Calculates the future value of an investment based on the present value, annual interest rate, and number of years.\", \"parameters\": {\"present_value\": {\"description\": \"The present value of the investment.\", \"type\": \"Double\"}, \"annual_interest_rate\": {\"description\": \"The annual interest rate as a decimal (e.g., 0.05 for 5%).\", \"type\": \"Double\"}, \"years\": {\"description\": \"The number of years the investment will grow.\", \"type\": \"Integer\"}}}]"
+  },
+  {
+    "id": 19,
+    "query": "For a star party in Cape Town on April 10th, 2023, at 10 PM, what celestial bodies will be in the sky?",
+    "answers": "[{\"name\": \"get_all_bodies_positions\", \"arguments\": {\"latitude\": -34, \"longitude\": 18, \"from_date\": \"2023-04-10\", \"to_date\": \"2023-04-10\", \"time\": \"22:00:00\"}}]",
+    "tools": "[{\"name\": \"get_all_bodies_positions\", \"description\": \"Fetches the positions of celestial bodies for a given location and date range using the Astronomy API.\", \"parameters\": {\"latitude\": {\"description\": \"The latitude of the location for which to get the positions.\", \"type\": \"Integer\", \"default\": 33}, \"longitude\": {\"description\": \"The longitude of the location for which to get the positions.\", \"type\": \"Integer\", \"default\": -84}, \"from_date\": {\"description\": \"The start date for the observation period in the format 'YYYY-MM-DD'.\", \"type\": \"String\", \"default\": \"2017-12-20\"}, \"to_date\": {\"description\": \"The end date for the observation period in the format 'YYYY-MM-DD'.\", \"type\": \"String\", \"default\": \"2017-12-21\"}, \"elevation\": {\"description\": \"The elevation of the location in meters.\", \"type\": \"Integer\", \"default\": 166}, \"time\": {\"description\": \"The specific time of day for the observation in the format 'HH:MM:SS'.\", \"type\": \"String\", \"default\": \"12:00:00\"}}}]"
+  },
+  {
+    "id": 20,
+    "query": "What is the binary sum of 10010 and 11101?",
+    "answers": "[{\"name\": \"binary_addition\", \"arguments\": {\"a\": \"10010\", \"b\": \"11101\"}}]",
+    "tools": "[{\"name\": \"binary_addition\", \"description\": \"Adds two binary numbers and returns the result as a binary string.\", \"parameters\": {\"a\": {\"description\": \"The first binary number.\", \"type\": \"String\"}, \"b\": {\"description\": \"The second binary number.\", \"type\": \"String\"}}}, {\"name\": \"create_histogram\", \"description\": \"Create a histogram based on provided data.\", \"parameters\": {\"data\": {\"description\": \"The data for which histogram needs to be plotted.\", \"type\": \"List\", \"default\": 10}, \"bins\": {\"description\": \"The number of equal-width bins in the range.\", \"type\": \"Integer\", \"default\": 10}}}]"
+  },
+  {
+    "id": 21,
+    "query": "Fetch detailed information about a product with ID 12345.",
+    "answers": "[{\"name\": \"get_product\", \"arguments\": {\"is_id\": 12345}}]",
+    "tools": "[{\"name\": \"facebook_ad_copy\", \"description\": \"Generates a Facebook ad copy using AI based on the provided description and name.\", \"parameters\": {\"description\": {\"description\": \"The description to be used for generating the ad copy.\", \"type\": \"String\", \"default\": \"Apple designs, manufactures and markets smartphones, personal computers, tablets, wearables and accessories, and sells a variety of related services.\"}, \"name\": {\"description\": \"The name to be used for generating the ad copy.\", \"type\": \"String\", \"default\": \"Apple\"}}}, {\"name\": \"get_product\", \"description\": \"Fetches product details from a RapidAPI endpoint using the provided product ID and RapidAPI key.\", \"parameters\": {\"is_id\": {\"description\": \"The ID of the product to retrieve information about.\", \"type\": \"Integer\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 22,
+    "query": "Could you fetch recommendations for experiment 24680 in the technology sector to improve user experience?",
+    "answers": "[{\"name\": \"recommend\", \"arguments\": {\"experiment_id\": 24680}}]",
+    "tools": "[{\"name\": \"recommend\", \"description\": \"Fetches a recommendation for a given experiment ID using the Toolbench RapidAPI service.\", \"parameters\": {\"experiment_id\": {\"description\": \"The ID of the experiment for which to fetch recommendations.\", \"type\": \"Integer\", \"default\": 12234}}}]"
+  },
+  {
+    "id": 23,
+    "query": "Can you fetch the location details for the NCAA Final Four event in 2019? Also, provide the unique stage image for the 5th stage in the Motorsport API.",
+    "answers": "[{\"name\": \"location\", \"arguments\": {\"identifier\": \"2019\"}}, {\"name\": \"uniquestageimage\", \"arguments\": {\"is_id\": 5}}]",
+    "tools": "[{\"name\": \"location\", \"description\": \"Fetches the location and venue details of the NCAA Final Four event for a given identifier.\", \"parameters\": {\"identifier\": {\"description\": \"A unique identifier representing the year or specific event to retrieve location details for.\", \"type\": \"String\", \"default\": \"1952\"}}}, {\"name\": \"uniquestageimage\", \"description\": \"Retrieves the image for a specific Motorsport unique stage using the provided stage ID.\", \"parameters\": {\"is_id\": {\"description\": \"The unique stage ID for which to retrieve the image.\", \"type\": \"Integer\", \"default\": 40}}}]"
+  },
+  {
+    "id": 24,
+    "query": "In a Rock-Paper-Scissors game, what does the API say when I choose 'rock'? Furthermore, fetch comments for the video 'L0p3kJQP7kiw5Fk' with a US geolocation.",
+    "answers": "[{\"name\": \"choice_endpoint\", \"arguments\": {\"choice\": \"rock\"}}, {\"name\": \"video_comments\", \"arguments\": {\"is_id\": \"L0p3kJQP7kiw5Fk\", \"gl\": \"US\"}}]",
+    "tools": "[{\"name\": \"choice_endpoint\", \"description\": \"Sends a GET request to the Rock-Paper-Scissors API with the user's choice and returns the API's response.\", \"parameters\": {\"choice\": {\"description\": \"The user's selection, either 'rock', 'paper', or 'scissors'.\", \"type\": \"String\", \"default\": \"rock\"}}}, {\"name\": \"video_comments\", \"description\": \"Fetches comments for a specified YouTube video using the RapidAPI service.\", \"parameters\": {\"cursor\": {\"description\": \"Cursor token for pagination.\", \"type\": \"String\", \"default\": \"\"}, \"gl\": {\"description\": \"Geolocation code.\", \"type\": \"String\", \"default\": \"US\"}, \"is_id\": {\"description\": \"YouTube video ID.\", \"type\": \"String\", \"default\": \"kJQP7kiw5Fk\"}, \"hl\": {\"description\": \"Language code.\", \"type\": \"String\", \"default\": \"en\"}}}]"
+  },
+  {
+    "id": 25,
+    "query": "Fetch 3 random movies from the database.",
+    "answers": "[{\"name\": \"getrandommovie\", \"arguments\": {\"count\": 3}}]",
+    "tools": "[{\"name\": \"estimated_salary\", \"description\": \"Fetch the estimated salary for a given job title within a specified radius around a particular location.\", \"parameters\": {\"location\": {\"description\": \"The geographic location to search within for the salary estimation.\", \"type\": \"String\", \"default\": \"New-York, NY, USA\"}, \"job_title\": {\"description\": \"The job title for which the salary estimation is to be fetched.\", \"type\": \"String\", \"default\": \"NodeJS Developer\"}, \"radius\": {\"description\": \"The radius in kilometers within which to search from the provided location.\", \"type\": \"Integer\", \"default\": 100}}}, {\"name\": \"getrandommovie\", \"description\": \"Returns a list of random movies from a database by calling an external API.\", \"parameters\": {\"count\": {\"description\": \"The number of random movies to return.\", \"type\": \"Integer\", \"default\": 2}}}]"
+  },
+  {
+    "id": 26,
+    "query": "Can you provide the insider holders' information for Tesla's stock and the latest market trends in the US for crypto?",
+    "answers": "[{\"name\": \"stock_insider_holders_stock\", \"arguments\": {\"symbol\": \"TSLA\"}}, {\"name\": \"market_trends\", \"arguments\": {\"trend_type\": \"CRYPTO\", \"country\": \"us\"}}]",
+    "tools": "[{\"name\": \"stock_insider_holders_stock\", \"description\": \"Fetches insider holders' information for a given stock symbol using the mboum-finance API.\", \"parameters\": {\"symbol\": {\"description\": \"The stock symbol for which to fetch insider holders' information.\", \"type\": \"String\", \"default\": \"AAPL\"}}}, {\"name\": \"market_trends\", \"description\": \"Fetch the latest market trends and relevant news based on the specified trend type.\", \"parameters\": {\"trend_type\": {\"description\": \"The type of trend to retrieve.\", \"type\": \"String\", \"default\": \"\"}, \"country\": {\"description\": \"The country for which to fetch trends, specified as a 2-letter country code (ISO 3166).\", \"type\": \"String\", \"default\": \"us\"}, \"language\": {\"description\": \"The language to use for the results, specified as a 2-letter language code (ISO 639-1).\", \"type\": \"String\", \"default\": \"en\"}}}]"
+  },
+  {
+    "id": 27,
+    "query": "I'm curious about the top actors in Italy and any recent news about the environment from Italy.",
+    "answers": "[{\"name\": \"actors_list_most_popular_celebs\", \"arguments\": {\"currentcountry\": \"IT\"}}, {\"name\": \"get_news\", \"arguments\": {\"category\": \"environment\", \"region\": \"it\"}}]",
+    "tools": "[{\"name\": \"actors_list_most_popular_celebs\", \"description\": \"Fetch the list of most popular celebrities from the online movie database API.\", \"parameters\": {\"currentcountry\": {\"description\": \"The current country of the user.\", \"type\": \"String\", \"default\": \"US\"}, \"purchasecountry\": {\"description\": \"The country where the user typically makes purchases.\", \"type\": \"String\", \"default\": \"US\"}, \"homecountry\": {\"description\": \"The home country of the user.\", \"type\": \"String\", \"default\": \"US\"}}}, {\"name\": \"get_news\", \"description\": \"Fetches a list of news articles based on the specified category and region.\", \"parameters\": {\"category\": {\"description\": \"The category of news to fetch.\", \"type\": \"String\", \"default\": \"\"}, \"region\": {\"description\": \"The region code for which to fetch news.\", \"type\": \"String\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 28,
+    "query": "Check if the Vimeo username 'john_doe_artist' is available.",
+    "answers": "[{\"name\": \"vimeo\", \"arguments\": {\"username\": \"john_doe_artist\"}}]",
+    "tools": "[{\"name\": \"vimeo\", \"description\": \"Checks if a given Vimeo username is available using the Toolbench RapidAPI service.\", \"parameters\": {\"username\": {\"description\": \"The Vimeo username to check for availability.\", \"type\": \"String\", \"default\": \"username\"}}}]"
+  },
+  {
+    "id": 29,
+    "query": "Is the year 2000 a leap year?",
+    "answers": "[{\"name\": \"is_leap_year\", \"arguments\": {\"year\": 2000}}]",
+    "tools": "[{\"name\": \"is_leap_year\", \"description\": \"Checks if a year is a leap year.\", \"parameters\": {\"year\": {\"description\": \"The year to check.\", \"type\": \"Integer\"}}}]"
+  },
+  {
+    "id": 30,
+    "query": "Provide pre-match event details for event ID 5678 in English and Spanish.",
+    "answers": "[{\"name\": \"prematch_event\", \"arguments\": {\"lang\": \"en\", \"evt\": 5678}}, {\"name\": \"prematch_event\", \"arguments\": {\"lang\": \"es\", \"evt\": 5678}}]",
+    "tools": "[{\"name\": \"prematch_event\", \"description\": \"Fetches pre-match event data from a sports betting API.\", \"parameters\": {\"lang\": {\"description\": \"The language code for the API response.\", \"type\": \"String\", \"default\": \"en\"}, \"evt\": {\"description\": \"The event ID to fetch information for.\", \"type\": \"Integer\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 31,
+    "query": "I'm looking for information on competitions 'comp001' and 'comp002'. Can you help?",
+    "answers": "[{\"name\": \"competitions_id\", \"arguments\": {\"is_id\": \"comp001\"}}, {\"name\": \"competitions_id\", \"arguments\": {\"is_id\": \"comp002\"}}]",
+    "tools": "[{\"name\": \"competitions_id\", \"description\": \"Retrieves information about a specific competition using its ID.\", \"parameters\": {\"is_id\": {\"description\": \"The ID of the competition to be retrieved.\", \"type\": \"String\", \"default\": \"LAL\"}}}]"
+  },
+  {
+    "id": 32,
+    "query": "Project the investment growth for an initial amount of $10000, with an annual addition of $1000, over 5 years at a 5% return rate, with inflation rates of [2%, 2.5%, 3%, 3.5%, 4%].",
+    "answers": "[{\"name\": \"project_investment_growth\", \"arguments\": {\"principal\": 10000, \"annual_addition\": 1000, \"years\": 5, \"return_rate\": 0.05, \"inflation\": [0.02, 0.025, 0.03, 0.035, 0.04], \"inflation_adjusted\": true}}]",
+    "tools": "[{\"name\": \"project_investment_growth\", \"description\": \"Projects the growth of an investment over a specified number of years.\", \"parameters\": {\"principal\": {\"description\": \"The initial investment amount.\", \"type\": \"Double\"}, \"annual_addition\": {\"description\": \"The amount added to the investment annually.\", \"type\": \"Double\"}, \"years\": {\"description\": \"The number of years to project the investment growth.\", \"type\": \"Integer\"}, \"return_rate\": {\"description\": \"The annual return rate as a decimal (e.g., 0.07 for 7%).\", \"type\": \"Double\"}, \"inflation\": {\"description\": \"A list of annual inflation rates as decimals.\", \"type\": \"List\"}, \"inflation_adjusted\": {\"description\": \"Whether to adjust the final value for inflation.\", \"type\": \"Boolean\", \"default\": true}}}]"
+  },
+  {
+    "id": 33,
+    "query": "Retrieve time series snapshots for profile ID '12345'.",
+    "answers": "[{\"name\": \"get_profile_series\", \"arguments\": {\"profile_id\": \"12345\"}}]",
+    "tools": "[{\"name\": \"get_profile_series\", \"description\": \"Fetches time series snapshots of a profile from the OutSystems Community API.\", \"parameters\": {\"profile_id\": {\"description\": \"The unique identifier of the profile for which the time series snapshots are to be fetched.\", \"type\": \"String\", \"default\": \"yjjslxnjng\"}}}]"
+  },
+  {
+    "id": 34,
+    "query": "What is the entity information for UID 654321 and what are the details of order 7?",
+    "answers": "[{\"name\": \"get_data_entity_uid\", \"arguments\": {\"uid\": 654321}}, {\"name\": \"getorderbyid\", \"arguments\": {\"orderid\": 7}}]",
+    "tools": "[{\"name\": \"get_data_entity_uid\", \"description\": \"Fetches an entity record from the OFAC service using a unique identifier (UID).\", \"parameters\": {\"uid\": {\"description\": \"The unique identifier of the entity to retrieve.\", \"type\": \"Integer\", \"default\": 7178}}}, {\"name\": \"getorderbyid\", \"description\": \"Fetches the order details from the Petstore API using the provided order ID.\", \"parameters\": {\"orderid\": {\"description\": \"The ID of the order to be fetched.\", \"type\": \"Integer\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 35,
+    "query": "Place an order at the Safeway store in 'San Francisco, CA' for 3 apples, 2 loaves of bread, and 1 gallon of milk.",
+    "answers": "[{\"name\": \"place_safeway_order\", \"arguments\": {\"location\": \"San Francisco, CA\", \"items\": [\"apples\", \"bread\", \"milk\"], \"quantity\": [3, 2, 1]}}]",
+    "tools": "[{\"name\": \"place_safeway_order\", \"description\": \"Order specified items from a Safeway location.\", \"parameters\": {\"location\": {\"description\": \"The location of the Safeway store, e.g., 'Palo Alto, CA'.\", \"type\": \"String\"}, \"items\": {\"description\": \"List of items to order.\", \"type\": \"List\"}, \"quantity\": {\"description\": \"Quantity of each item in the order list.\", \"type\": \"List\"}}}]"
+  },
+  {
+    "id": 36,
+    "query": "I need the photo of soccer player with ID 789.",
+    "answers": "[{\"name\": \"players_photo\", \"arguments\": {\"player_id\": 789}}]",
+    "tools": "[{\"name\": \"players_photo\", \"description\": \"Retrieves the photo of a soccer player given the player's ID using the Soccerway API.\", \"parameters\": {\"player_id\": {\"description\": \"The unique identifier of the soccer player.\", \"type\": \"Integer\", \"default\": 177208}}}]"
+  },
+  {
+    "id": 37,
+    "query": "What are the profiles of consumers 'ABC123', 'DEF456', and 'GHI789'?",
+    "answers": "[{\"name\": \"consumers_detail\", \"arguments\": {\"is_id\": \"ABC123\"}}, {\"name\": \"consumers_detail\", \"arguments\": {\"is_id\": \"DEF456\"}}, {\"name\": \"consumers_detail\", \"arguments\": {\"is_id\": \"GHI789\"}}]",
+    "tools": "[{\"name\": \"consumers_detail\", \"description\": \"Get detailed information of a consumer using the RapidAPI TrustPilot endpoint.\", \"parameters\": {\"is_id\": {\"description\": \"The ID of the consumer, as returned from the /business-units/get-reviews endpoint.\", \"type\": \"String\", \"default\": \"5f9c424654404f0019fb19fc\"}}}]"
+  },
+  {
+    "id": 38,
+    "query": "Could you find the historical daily prices for Netflix and Adobe stocks for the past three months?",
+    "answers": "[{\"name\": \"get_3_month_historical_daily_prices\", \"arguments\": {\"ticker\": \"NFLX\"}}, {\"name\": \"get_3_month_historical_daily_prices\", \"arguments\": {\"ticker\": \"ADBE\"}}]",
+    "tools": "[{\"name\": \"get_3_month_historical_daily_prices\", \"description\": \"Fetches 3 months of historical daily stock prices for the given ticker.\", \"parameters\": {\"ticker\": {\"description\": \"The stock ticker symbol to fetch historical prices for.\", \"type\": \"String\", \"default\": \"AAPL\"}}}]"
+  },
+  {
+    "id": 39,
+    "query": "Can you fetch the categories and their child categories for the root category ID 214970 from Wayfair?",
+    "answers": "[{\"name\": \"categories_list\", \"arguments\": {\"caid\": 214970}}]",
+    "tools": "[{\"name\": \"categories_list\", \"description\": \"Fetches a list of categories and their recursive child categories from the Wayfair API.\", \"parameters\": {\"caid\": {\"description\": \"The category ID for which to list categories. The default root category is 214970.\", \"type\": \"Integer\", \"default\": 214970}}}]"
+  },
+  {
+    "id": 40,
+    "query": "Retrieve the first page of games from the EvoSiss Game Database.",
+    "answers": "[{\"name\": \"getgamelist\", \"arguments\": {\"page\": 1}}]",
+    "tools": "[{\"name\": \"getgamelist\", \"description\": \"Fetches a list of games from the EvoSiss Game Database API, returning their IDs and series names in JSON format.\", \"parameters\": {\"page\": {\"description\": \"The page number to retrieve from the game list.\", \"type\": \"Integer\", \"default\": 0}}}]"
+  },
+  {
+    "id": 41,
+    "query": "Find articles from the last week about COVID-19 in the UK. Also, suggest keywords for 'healthcare technology'.",
+    "answers": "[{\"name\": \"search\", \"arguments\": {\"q\": \"COVID-19\", \"gl\": \"UK\", \"tbs\": \"qdr:w\"}}, {\"name\": \"autosuggest\", \"arguments\": {\"q\": \"healthcare technology\"}}]",
+    "tools": "[{\"name\": \"search\", \"description\": \"Perform a Google search and retrieve the search results using the specified parameters.\", \"parameters\": {\"q\": {\"description\": \"The search query term.\", \"type\": \"String\", \"default\": \"liverpool\"}, \"gl\": {\"description\": \"The geographic location of the search results.\", \"type\": \"String\", \"default\": \"\"}, \"tbs\": {\"description\": \"The time-based search parameters (e.g., 'qdr:d' for past 24 hours).\", \"type\": \"String\", \"default\": \"\"}}}, {\"name\": \"autosuggest\", \"description\": \"Fetches and returns keyword autosuggestions from the RapidAPI service.\", \"parameters\": {\"q\": {\"description\": \"The keyword to search for related suggestions.\", \"type\": \"String\", \"default\": \"rabbit\"}}}]"
+  },
+  {
+    "id": 42,
+    "query": "Fetch a motivational quote about success.",
+    "answers": "[{\"name\": \"motivation_quote\", \"arguments\": {\"quotes\": \"success\"}}]",
+    "tools": "[{\"name\": \"motivation_quote\", \"description\": \"Fetches a motivational quote from the Olato Quotes API.\", \"parameters\": {\"quotes\": {\"description\": \"Type of quotes to fetch.\", \"type\": \"String\", \"default\": \"random quotes\"}}}]"
+  },
+  {
+    "id": 43,
+    "query": "List languages for Germany.",
+    "answers": "[{\"name\": \"language_list\", \"arguments\": {\"country\": \"DE\"}}]",
+    "tools": "[{\"name\": \"language_list\", \"description\": \"Fetches the list of valid languages for the given country using the Real Time News Data API.\", \"parameters\": {\"country\": {\"description\": \"The country code (ISO 3166-1 alpha-2) of the country to get languages for.\", \"type\": \"String\", \"default\": \"US\"}}}]"
+  },
+  {
+    "id": 44,
+    "query": "Could you provide the securities report for Rakuten?",
+    "answers": "[{\"name\": \"getlistbysecuritiescode\", \"arguments\": {\"securities_code\": 4755}}]",
+    "tools": "[{\"name\": \"getlistbysecuritiescode\", \"description\": \"Fetches the securities report data for a specified company using its securities code.\", \"parameters\": {\"securities_code\": {\"description\": \"The securities code of the company whose report data is to be fetched.\", \"type\": \"Integer\", \"default\": 7203}}}]"
+  },
+  {
+    "id": 45,
+    "query": "Find the minimum element in the rotated sorted array [4, 5, 6, 7, 0, 1, 2].",
+    "answers": "[{\"name\": \"find_minimum_rotated_sorted_array\", \"arguments\": {\"nums\": [4, 5, 6, 7, 0, 1, 2]}}]",
+    "tools": "[{\"name\": \"find_minimum_rotated_sorted_array\", \"description\": \"Finds the minimum element in a rotated sorted array.\", \"parameters\": {\"nums\": {\"description\": \"The rotated sorted array.\", \"type\": \"List\"}}}]"
+  },
+  {
+    "id": 46,
+    "query": "What suggestions does the system offer for 'autum' and 'winer' in terms of seasonal clothing?",
+    "answers": "[{\"name\": \"auto_complete_deprecating\", \"arguments\": {\"query\": \"autum\"}}, {\"name\": \"auto_complete_deprecating\", \"arguments\": {\"query\": \"winer\"}}]",
+    "tools": "[{\"name\": \"auto_complete_deprecating\", \"description\": \"Fetch auto-complete suggestions for a given query from the specified API.\", \"parameters\": {\"query\": {\"description\": \"The term or phrase for which to get suggestions.\", \"type\": \"String\", \"default\": \"bikini tops\"}}}]"
+  },
+  {
+    "id": 47,
+    "query": "What is the longest common prefix of 'prefix', 'preamble', 'pretext'?",
+    "answers": "[{\"name\": \"longest_common_prefix\", \"arguments\": {\"strs\": [\"prefix\", \"preamble\", \"pretext\"]}}]",
+    "tools": "[{\"name\": \"longest_common_prefix\", \"description\": \"Finds the longest common prefix among a list of strings.\", \"parameters\": {\"strs\": {\"description\": \"The list of strings.\", \"type\": \"List\"}}}]"
+  },
+  {
+    "id": 48,
+    "query": "Retrieve the cheapest 15 townhouses in Delray Beach starting from the 5th listing.",
+    "answers": "[{\"name\": \"getlistings\", \"arguments\": {\"sort\": \"PRICE_LOW\", \"offset\": 5, \"limit\": 15, \"city\": \"Delray Beach\"}}]",
+    "tools": "[{\"name\": \"getlistings\", \"description\": \"Retrieve a list of condominiums and townhouses in specified cities of Southwest Florida and the East Coast.\", \"parameters\": {\"sort\": {\"description\": \"Defines how the listings should be sorted. Supported values are 'RELEVANCE' (best match), 'NEWEST' (newest first), 'PRICE_LOW' (cheapest first), and 'PRICE_HIGH' (most expensive first).\", \"type\": \"String\", \"default\": \"RELEVANCE\"}, \"offset\": {\"description\": \"For pagination. Specifies the starting point in the collection of listings.\", \"type\": \"Integer\", \"default\": 0}, \"price_max\": {\"description\": \"The maximum price in US dollars for the condos and townhouses.\", \"type\": \"Integer\", \"default\": 250000}, \"city\": {\"description\": \"The name of the city to search within.\", \"type\": \"String\", \"default\": \"Cape Coral\"}, \"limit\": {\"description\": \"The maximum number of items to return.\", \"type\": \"Integer\", \"default\": 50}}}]"
+  },
+  {
+    "id": 49,
+    "query": "Can you get a dirty drinking challenge and the latest short videos from a YouTube channel?",
+    "answers": "[{\"name\": \"get_random_challange\", \"arguments\": {\"type\": \"dirty\"}}, {\"name\": \"channel_videos\", \"arguments\": {\"is_id\": \"UC-lHJZR3Gqxm24_Vd_AJ5Yw\", \"filter\": \"shorts_latest\"}}]",
+    "tools": "[{\"name\": \"get_random_challange\", \"description\": \"Fetch a random challenge from the specified API, with an option to specify the type of challenge.\", \"parameters\": {\"type\": {\"description\": \"The type of challenge to fetch. Options are 'funny', 'dirty', 'sport'.\", \"type\": \"String\", \"default\": \"funny\"}}}, {\"name\": \"channel_videos\", \"description\": \"Fetches videos from a specified YouTube channel using RapidAPI.\", \"parameters\": {\"is_id\": {\"description\": \"YouTube channel ID.\", \"type\": \"String\", \"default\": \"UC-lHJZR3Gqxm24_Vd_AJ5Yw\"}, \"filter\": {\"description\": \"Filter key to determine the type of videos returned. Can be 'videos_latest', 'streams_latest', 'shorts_latest', or 'live_now'.\", \"type\": \"String\", \"default\": \"\"}}}]"
+  },
+  {
+    "id": 50,
+    "query": "Fetch the first 15 comments on a Twitter post with ID '1380500000000000000' and the followers of 'instagram_user_id_543' in batches of 25.",
+    "answers": "[{\"name\": \"get_post_comments\", \"arguments\": {\"pid\": \"1380500000000000000\", \"count\": \"15\"}}, {\"name\": \"followers\", \"arguments\": {\"user_id\": \"instagram_user_id_543\", \"batch_size\": 25}}]",
+    "tools": "[{\"name\": \"get_post_comments\", \"description\": \"Fetch comments for a given Twitter post using its post ID.\", \"parameters\": {\"pid\": {\"description\": \"The post ID for which to retrieve comments.\", \"type\": \"String\", \"default\": \"1552735248026411010\"}, \"count\": {\"description\": \"The number of comments to retrieve.\", \"type\": \"String\", \"default\": \"40\"}}}, {\"name\": \"followers\", \"description\": \"Retrieves the list of followers for a given Instagram user.\", \"parameters\": {\"user_id\": {\"description\": \"The ID of the Instagram user whose followers are to be retrieved.\", \"type\": \"String\", \"default\": \"25025320\"}, \"batch_size\": {\"description\": \"The number of followers to retrieve in one batch.\", \"type\": \"Integer\", \"default\": 20}}}]"
+  }
+]
