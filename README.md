@@ -1,4 +1,9 @@
 # Qwen3-ToolCalling-FineTune
 
 
-###Todo: use this `MadeAgents/xlam-irrelevance-7.5k` data set and combine it with the current dataset. this will reduce the bias that model will use tools when the request is irrelevent.
+### Dataset
+- `MadeAgents/xlam-irrelevance-7.5k`
+- `Salesforce/xlam-function-calling-60k`
+
+##### Models on Hugging Face `MadhuryaPasan/qwen3-1.7_expert_tools_v2_gguf`
+##### Ollama Link
